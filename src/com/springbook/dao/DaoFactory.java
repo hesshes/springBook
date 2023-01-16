@@ -23,6 +23,7 @@ public class DaoFactory {
 }
 */
 
+/* step 7 : DI, DL 주입 예제 코드 
 @Configuration
 public class DaoFactory {
 
@@ -35,6 +36,28 @@ public class DaoFactory {
 		return new UserDao(connectionMaker());
 	}
 
+	@Bean
+	public ConnectionMaker connectionMaker() {
+		return new DConnectionMaker();
+	}
+}
+*/
+/* */
+@Configuration
+public class DaoFactory {
+
+	@Bean
+	public UserDao userDao() { 
+		UserDao userDao = new UserDao();
+		userDao.setConnectionMaker(connectionMaker());
+		return userDao;
+	}
+	
+	/*
+	 * @Bean public UserDao userDao(ConnectionMaker connectionMaker) { return new
+	 * UserDao(connectionMaker()); }
+	 */
+	
 	@Bean
 	public ConnectionMaker connectionMaker() {
 		return new DConnectionMaker();

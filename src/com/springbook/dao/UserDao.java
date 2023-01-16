@@ -315,6 +315,7 @@ public User get(String id) throws ClassNotFoundException, SQLException {
 }
 */
 
+/* step 8 : DI, DL 
 public class UserDao {
 
 	private ConnectionMaker connectionMaker;
@@ -367,6 +368,59 @@ public class UserDao {
 		ps.close();
 		c.close();
 
+		return this.user;
+	}
+}
+*/
+
+/* step 9 : 수정자 메소드 DI 방식*/
+public class UserDao {
+	
+	private ConnectionMaker connectionMaker;
+	
+	private Connection c;
+	private User user;
+	
+	public void setConnectionMaker(ConnectionMaker connectionMaker) {
+		this.connectionMaker = connectionMaker;
+	}
+	
+	public void add(User user) throws ClassNotFoundException, SQLException {
+		
+		this.c = connectionMaker.makeConnection();
+		
+		PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
+		ps.setString(1, user.getId());
+		ps.setString(2, user.getName());
+		ps.setString(3, user.getPassword());
+		
+		ps.executeLargeUpdate();
+		
+		ps.close();
+		
+		c.close();
+	}
+	
+	public User get(String id) throws ClassNotFoundException, SQLException {
+		
+		this.c = connectionMaker.makeConnection();
+		
+		PreparedStatement ps = c.prepareStatement("select * from users where id = ?");
+		ps.setString(1, id);
+		
+		ResultSet rs = ps.executeQuery();
+		
+		rs.next();
+		
+		this.user = new User();
+		this.user.setId(rs.getString("id"));
+		this.user.setName(rs.getString("name"));
+		this.user.setPassword(rs.getString("password"));
+		
+		rs.close();
+		ps.close();
+		c.close();
+		
 		return this.user;
 	}
 }
