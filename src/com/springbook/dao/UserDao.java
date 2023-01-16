@@ -198,14 +198,15 @@ public class UserDao {
 	}
 }*/
 
+/*
 public class UserDao {
 
 	private ConnectionMaker connectionMaker;
 
-	/*
+	
 	 * step 5: 관계설정 분리전 public UserDao() { connectionMaker = new DConnectionMaker();
 	 * }
-	 */
+	 
 
 	public UserDao() {
 	}
@@ -251,5 +252,121 @@ public class UserDao {
 		c.close();
 
 		return user;
+	}
+}
+*/
+
+/* step x : singtone 코드 포함된 객체
+
+public class UserDao {
+
+private static UserDao INSTANCE;
+
+private ConnectionMaker connectionMaker;
+
+private UserDao(ConnectionMaker connectionMaker) {
+	this.connectionMaker = connectionMaker;
+}
+
+public static synchronized UserDao getInstance() {
+	if (INSTANCE == null)
+		INSTANCE = new UserDao(null);
+	return INSTANCE;
+}
+
+public void add(User user) throws ClassNotFoundException, SQLException {
+
+	Connection c = connectionMaker.makeConnection();
+
+	PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
+	ps.setString(1, user.getId());
+	ps.setString(2, user.getName());
+	ps.setString(3, user.getPassword());
+
+	ps.executeLargeUpdate();
+
+	ps.close();
+
+	c.close();
+}
+
+public User get(String id) throws ClassNotFoundException, SQLException {
+
+	Connection c = connectionMaker.makeConnection();
+
+	PreparedStatement ps = c.prepareStatement("select * from users where id = ?");
+	ps.setString(1, id);
+
+	ResultSet rs = ps.executeQuery();
+
+	rs.next();
+
+	User user = new User();
+	user.setId(rs.getString("id"));
+	user.setName(rs.getString("name"));
+	user.setPassword(rs.getString("password"));
+
+	rs.close();
+	ps.close();
+	c.close();
+
+	return user;
+}
+}
+*/
+
+public class UserDao {
+
+	private ConnectionMaker connectionMaker;
+
+	private Connection c;
+	private User user;
+
+	public UserDao() {
+
+	}
+
+	public UserDao(ConnectionMaker connectionMaker) {
+		this.connectionMaker = connectionMaker;
+
+	}
+
+	public void add(User user) throws ClassNotFoundException, SQLException {
+
+		this.c = connectionMaker.makeConnection();
+
+		PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
+		ps.setString(1, user.getId());
+		ps.setString(2, user.getName());
+		ps.setString(3, user.getPassword());
+
+		ps.executeLargeUpdate();
+
+		ps.close();
+
+		c.close();
+	}
+
+	public User get(String id) throws ClassNotFoundException, SQLException {
+
+		this.c = connectionMaker.makeConnection();
+
+		PreparedStatement ps = c.prepareStatement("select * from users where id = ?");
+		ps.setString(1, id);
+
+		ResultSet rs = ps.executeQuery();
+
+		rs.next();
+
+		this.user = new User();
+		this.user.setId(rs.getString("id"));
+		this.user.setName(rs.getString("name"));
+		this.user.setPassword(rs.getString("password"));
+
+		rs.close();
+		ps.close();
+		c.close();
+
+		return this.user;
 	}
 }
