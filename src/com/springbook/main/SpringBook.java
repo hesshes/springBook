@@ -4,6 +4,8 @@ import java.sql.SQLException;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.GenericXmlApplicationContext;
 
 import com.springbook.dao.ConnectionMaker;
 import com.springbook.dao.CountingConnectionMaker;
@@ -13,21 +15,22 @@ import com.springbook.dao.DaoFactory;
 import com.springbook.dao.UserDao;
 import com.springbook.domain.User;
 
+/* XML 설정 전까지 사용했던 MAIN
 public class SpringBook {
 	public static void main(String[] args) throws ClassNotFoundException, SQLException {
 
-		/*
+		
 		 * //step1 ~ step5 전까지 UserDao 테스트 //UserDao dao = new UserDao();
-		 */
+		 
 
-		/*
+		
 		 * //step6 : 관계설정 분리 적용중 테스트 //ConnectionMaker connectionMaker = new
 		 * DConnectionMaker(); //UserDao dao = new UserDao(connectionMaker);
-		 */
+		 
 
-		/*
+		
 		 * //step6 : 관계설정 분리 적용한 코드 UserDao dao = new DaoFactory().userDao();
-		 */
+		 
 
 		ApplicationContext ctx = new AnnotationConfigApplicationContext(DaoFactory.class);
 		UserDao dao = ctx.getBean("userDao", UserDao.class);
@@ -44,7 +47,7 @@ public class SpringBook {
 		User user2 = dao.get("setMethod");
 		System.out.println("user2 ID : " + user2.getId());
 		
-		/*
+		
 		 * DaoFactory df = new DaoFactory(); UserDao dao2 = df.userDao(); UserDao dao3 =
 		 * df.userDao();
 		 * 
@@ -70,7 +73,38 @@ public class SpringBook {
 		 * CountingConnectionMaker ccm = countCtx.getBean("connectionMaker",
 		 * CountingConnectionMaker.class); System.out.println("countDao : " + countDao);
 		 * System.out.println("Connection counter: " + ccm.getCounter());
+		 
+	}
+	*/
+
+public class SpringBook {
+	public static void main(String[] args) throws ClassNotFoundException, SQLException {
+
+		//ApplicationContext ctx = new GenericXmlApplicationContext("/com/springbook/dao/applicationContext.xml");
+		ApplicationContext ctx = new AnnotationConfigApplicationContext(DaoFactory.class);
+
+		/*
+		 * UserDao.class의 상대위치에서 daoContext.xml을 찾는다. 즉, 쉽게 말해 UserDao.class가 존재하는 클래스
+		 * 패스에서 해당 파일을 찾음
+		 * 
+		 * ApplicationContext ctx = new ClassPathXmlApplicationContext("daoContext.xml",
+		 * UserDao.class);
+		 * 
 		 */
+
+		UserDao dao = ctx.getBean("userDao", UserDao.class);
+
+		User user = new User();
+		user.setId("datasource");
+		user.setName("db");
+		user.setPassword("spring");
+
+		dao.add(user);
+
+		System.out.println(user.getId() + " 등록 성공 ");
+
+		User user2 = dao.get("setMethod");
+		System.out.println("user2 ID : " + user2.getId());
 	}
 
 }

@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="C:/devTools/spring_3.0.7_jar/spring-core-3.0.7.RELEASE.jar"/>
 	<classpathentry kind="lib" path="C:/devTools/spring_3.0.7_jar/spring-expression-3.0.7.RELEASE.jar"/>
 	<classpathentry kind="lib" path="C:/devTools/sqldeveloper/jdbc/lib/ojdbc8.jar"/>
+	<classpathentry kind="lib" path="C:/devTools/spring_3.0.7_jar/spring-jdbc-3.0.7.RELEASE.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
