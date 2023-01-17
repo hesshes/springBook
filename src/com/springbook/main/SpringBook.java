@@ -80,8 +80,11 @@ public class SpringBook {
 public class SpringBook {
 	public static void main(String[] args) throws ClassNotFoundException, SQLException {
 
-		//ApplicationContext ctx = new GenericXmlApplicationContext("/com/springbook/dao/applicationContext.xml");
-		ApplicationContext ctx = new AnnotationConfigApplicationContext(DaoFactory.class);
+		// XML 정보로 실행할 때
+		ApplicationContext ctx = new GenericXmlApplicationContext("/com/springbook/dao/applicationContext.xml");
+
+		// @Configuration으로 실행할 때
+		//ApplicationContext ctx = new AnnotationConfigApplicationContext(DaoFactory.class);
 
 		/*
 		 * UserDao.class의 상대위치에서 daoContext.xml을 찾는다. 즉, 쉽게 말해 UserDao.class가 존재하는 클래스
@@ -95,15 +98,15 @@ public class SpringBook {
 		UserDao dao = ctx.getBean("userDao", UserDao.class);
 
 		User user = new User();
-		user.setId("datasource");
-		user.setName("db");
+		user.setId("xmlDataSource");
+		user.setName("xmldb");
 		user.setPassword("spring");
 
 		dao.add(user);
 
 		System.out.println(user.getId() + " 등록 성공 ");
 
-		User user2 = dao.get("setMethod");
+		User user2 = dao.get("datasource");
 		System.out.println("user2 ID : " + user2.getId());
 	}
 

@@ -115,7 +115,7 @@ public class DaoFactory {
 	public DataSource dataSource() {
 		SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
 
-		dataSource.setDriverClass(Driver.class);
+		dataSource.setDriverClass(oracle.jdbc.OracleDriver.class);
 		dataSource.setUrl("jdbc:oracle:thin:@localhost:1521:xe");
 		dataSource.setUsername("hesshes");
 		dataSource.setPassword("hesshes");

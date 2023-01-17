@@ -3,10 +3,22 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<bean id="connectionMaker"
-		class="com.springbook.dao.DConnectionMaker" />
-		
-	<bean id="userDao" class="com.springbook.dao.UserDao">
-		<property name="connectionMaker" ref="connectionMaker" />
+	<!-- <bean id="connectionMaker" class="com.springbook.dao.DConnectionMaker" 
+		/> <bean id="userDao" class="com.springbook.dao.UserDao"> <property name="connectionMaker" 
+		ref="connectionMaker" /> </bean> -->
+
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+		<property name="driverClass" value="oracle.jdbc.OracleDriver" />
+		<property name="url"
+			value="jdbc:oracle:thin:@localhost:1521:xe" />
+		<property name="username" value="hesshes" />
+		<property name="password" value="hesshes" />
 	</bean>
+
+	<bean id="userDao" class="com.springbook.dao.UserDao">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+
 </beans>
