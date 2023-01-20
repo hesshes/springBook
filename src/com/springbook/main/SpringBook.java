@@ -84,7 +84,8 @@ public class SpringBook {
 		ApplicationContext ctx = new GenericXmlApplicationContext("/com/springbook/dao/applicationContext.xml");
 
 		// @Configuration으로 실행할 때
-		//ApplicationContext ctx = new AnnotationConfigApplicationContext(DaoFactory.class);
+		// ApplicationContext ctx = new
+		// AnnotationConfigApplicationContext(DaoFactory.class);
 
 		/*
 		 * UserDao.class의 상대위치에서 daoContext.xml을 찾는다. 즉, 쉽게 말해 UserDao.class가 존재하는 클래스
@@ -98,16 +99,22 @@ public class SpringBook {
 		UserDao dao = ctx.getBean("userDao", UserDao.class);
 
 		User user = new User();
-		user.setId("xmlDataSource");
-		user.setName("xmldb");
+		user.setId("tdd01");
+		user.setName("tdd");
 		user.setPassword("spring");
 
 		dao.add(user);
 
 		System.out.println(user.getId() + " 등록 성공 ");
 
-		User user2 = dao.get("datasource");
-		System.out.println("user2 ID : " + user2.getId());
+		User user2 = dao.get("tdd01");
+		if (!user.getId().equals(user2.getId())) {
+			System.out.println("테스트 실패  name");
+		} else if (!user.getPassword().equals(user2.getPassword())) {
+			System.out.println("테스트 실패 password");
+		} else {
+			System.out.println("조회 테스트 성공");
+		}
 	}
 
 }
