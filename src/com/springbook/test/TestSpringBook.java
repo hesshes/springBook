@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -33,7 +34,7 @@ public class TestSpringBook {
 
 		dao.add(user1);
 		dao.add(user2);
-		
+
 		assertThat(dao.getCount(), is(2));
 
 		/*
@@ -46,12 +47,13 @@ public class TestSpringBook {
 		User userGet1 = dao.get(user1.getId());
 		assertThat(userGet1.getName(), is(user1.getName()));
 		assertThat(userGet1.getPassword(), is(user1.getPassword()));
-		
+
 		User userGet2 = dao.get(user2.getId());
 		assertThat(userGet2.getName(), is(user2.getName()));
 		assertThat(userGet2.getPassword(), is(user2.getPassword()));
 	}
 
+	@Test
 	public void count() throws SQLException {
 		ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
 
@@ -72,5 +74,17 @@ public class TestSpringBook {
 
 		dao.add(user3);
 		assertThat(dao.getCount(), is(3));
+	}
+
+	@Test(expected = EmptyResultDataAccessException.class)
+	public void getUserFailure() throws SQLException {
+
+		ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+		UserDao dao = ctx.getBean("userDao", UserDao.class);
+
+		dao.deleteAll();
+		assertThat(dao.getCount(), is(0));
+		
+		dao.get("unknown_id");
 	}
 }

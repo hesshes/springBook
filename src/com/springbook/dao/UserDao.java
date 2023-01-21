@@ -8,6 +8,8 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import org.springframework.dao.EmptyResultDataAccessException;
+
 import com.springbook.domain.User;
 
 /*
@@ -432,7 +434,6 @@ public class UserDao {
 	private DataSource dataSource;
 
 	private Connection c;
-	private User user;
 
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
@@ -463,18 +464,29 @@ public class UserDao {
 
 		ResultSet rs = ps.executeQuery();
 
-		rs.next();
-
-		this.user = new User();
-		this.user.setId(rs.getString("id"));
-		this.user.setName(rs.getString("name"));
-		this.user.setPassword(rs.getString("password"));
-
+		/* 예외처리 하기 전 코드
+		 * rs.next();
+		 * 
+		 * this.user = new User(); this.user.setId(rs.getString("id"));
+		 * this.user.setName(rs.getString("name"));
+		 * this.user.setPassword(rs.getString("password"));
+		 */
+		User user = null;
+		
+		if(rs.next()) {
+			user = new User();
+			user.setId(rs.getString("id"));
+			user.setName(rs.getString("name"));
+			user.setPassword(rs.getString("password"));
+		}
+		
 		rs.close();
 		ps.close();
 		c.close();
 
-		return this.user;
+		if (user == null) throw new EmptyResultDataAccessException(1);
+		
+		return user;
 	}
 
 	public void deleteAll() throws SQLException {
