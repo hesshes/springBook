@@ -2,6 +2,7 @@ package com.springbook.main;
 
 import java.sql.SQLException;
 
+import org.junit.runner.JUnitCore;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -77,24 +78,28 @@ public class SpringBook {
 	}
 	*/
 
+/* junit 사용하기전 까지 테스트 과정
 public class SpringBook {
 	public static void main(String[] args) throws ClassNotFoundException, SQLException {
 
 		// XML 정보로 실행할 때
-		ApplicationContext ctx = new GenericXmlApplicationContext("/com/springbook/dao/applicationContext.xml");
-
+		// 절대 경로로 지정
+		// ApplicationContext ctx = new GenericXmlApplicationContext("/com/springbook/dao/applicationContext.xml");
+		// 
+		ApplicationContext ctx = new GenericXmlApplicationContext("applicationContext.xml"); 
+		
 		// @Configuration으로 실행할 때
 		// ApplicationContext ctx = new
 		// AnnotationConfigApplicationContext(DaoFactory.class);
 
-		/*
+		
 		 * UserDao.class의 상대위치에서 daoContext.xml을 찾는다. 즉, 쉽게 말해 UserDao.class가 존재하는 클래스
 		 * 패스에서 해당 파일을 찾음
 		 * 
 		 * ApplicationContext ctx = new ClassPathXmlApplicationContext("daoContext.xml",
 		 * UserDao.class);
 		 * 
-		 */
+		 
 
 		UserDao dao = ctx.getBean("userDao", UserDao.class);
 
@@ -115,6 +120,13 @@ public class SpringBook {
 		} else {
 			System.out.println("조회 테스트 성공");
 		}
+	}
+
+}
+*/
+public class SpringBook {
+	public static void main(String[] args) throws ClassNotFoundException, SQLException {
+		JUnitCore.main("com.springbook.test.TestSpringBook");
 	}
 
 }
