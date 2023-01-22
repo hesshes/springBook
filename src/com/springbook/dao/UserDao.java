@@ -429,6 +429,7 @@ public class UserDao {
 	}
 	*/
 
+/* 2장 테스트 까지 사용함
 public class UserDao {
 
 	private DataSource dataSource;
@@ -464,13 +465,13 @@ public class UserDao {
 
 		ResultSet rs = ps.executeQuery();
 
-		/* 예외처리 하기 전 코드
+		 예외처리 하기 전 코드
 		 * rs.next();
 		 * 
 		 * this.user = new User(); this.user.setId(rs.getString("id"));
 		 * this.user.setName(rs.getString("name"));
 		 * this.user.setPassword(rs.getString("password"));
-		 */
+		 
 		User user = null;
 		
 		if(rs.next()) {
@@ -515,5 +516,445 @@ public class UserDao {
 		
 		return count;
 		
+	}
+}
+*/
+
+/* 템플릿 메소드 적용한 코드
+public class UserDao {
+
+	private DataSource dataSource;
+
+	private Connection c;
+
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
+
+	public void add(User user) throws SQLException {
+
+		this.c = dataSource.getConnection();
+
+		PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
+		ps.setString(1, user.getId());
+		ps.setString(2, user.getName());
+		ps.setString(3, user.getPassword());
+
+		ps.executeLargeUpdate();
+
+		ps.close();
+
+		c.close();
+	}
+
+	public User get(String id) throws SQLException {
+
+		this.c = dataSource.getConnection();
+
+		PreparedStatement ps = c.prepareStatement("select * from users where id = ?");
+		ps.setString(1, id);
+
+		ResultSet rs = ps.executeQuery();
+
+		
+		 * 예외처리 하기 전 코드 rs.next();
+		 * 
+		 * this.user = new User(); this.user.setId(rs.getString("id"));
+		 * this.user.setName(rs.getString("name"));
+		 * this.user.setPassword(rs.getString("password"));
+		 
+		User user = null;
+
+		if (rs.next()) {
+			user = new User();
+			user.setId(rs.getString("id"));
+			user.setName(rs.getString("name"));
+			user.setPassword(rs.getString("password"));
+		}
+
+		rs.close();
+		ps.close();
+		c.close();
+
+		if (user == null)
+			throw new EmptyResultDataAccessException(1);
+
+		return user;
+	}
+
+	public void deleteAll() throws SQLException {
+
+		Connection c = null;
+		PreparedStatement ps = null;
+
+		try {
+			c = dataSource.getConnection();
+			 ps = c.prepareStatement("delete from users"); 
+			ps = makeStatement(c);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			throw e;
+		} finally {
+			if (ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {
+				}
+			}
+			if (c != null) {
+				try {
+					c.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+
+		ps.close();
+		c.close();
+	}
+
+	public int getCount() throws SQLException {
+
+		Connection c = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			c = dataSource.getConnection();
+			ps = c.prepareStatement("select count(*) from users");
+
+			rs = ps.executeQuery();
+			rs.next();
+			return rs.getInt(1);
+
+		} catch (SQLException e) {
+			throw e;
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+				}
+			}
+			if (ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {
+				}
+			}
+			if (c != null) {
+				try {
+					c.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+	}
+
+	private PreparedStatement makeStatement(Connection c) throws SQLException {
+		PreparedStatement ps;
+		ps = c.prepareStatement("delete from users");
+		return ps;
+	}
+}
+*/
+
+/* 전략패턴 적용한 코드
+public class UserDao {
+
+	private DataSource dataSource;
+
+	private Connection c;
+
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
+
+	public void add(User user) throws SQLException {
+		StatementStrategy st = new AddStatement(user);
+		jdbcContextWithStatementStrategy(st);
+
+	}
+
+	public User get(String id) throws SQLException {
+
+		this.c = dataSource.getConnection();
+
+		PreparedStatement ps = c.prepareStatement("select * from users where id = ?");
+		ps.setString(1, id);
+
+		ResultSet rs = ps.executeQuery();
+		User user = null;
+
+		if (rs.next()) {
+			user = new User();
+			user.setId(rs.getString("id"));
+			user.setName(rs.getString("name"));
+			user.setPassword(rs.getString("password"));
+		}
+
+		rs.close();
+		ps.close();
+		c.close();
+
+		if (user == null)
+			throw new EmptyResultDataAccessException(1);
+
+		return user;
+	}
+
+	public void deleteAll() throws SQLException {
+		StatementStrategy st = new DeleteAllStatement();
+		jdbcContextWithStatementStrategy(st);
+	}
+
+	public int getCount() throws SQLException {
+
+		Connection c = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			c = dataSource.getConnection();
+			ps = c.prepareStatement("select count(*) from users");
+
+			rs = ps.executeQuery();
+			rs.next();
+			return rs.getInt(1);
+
+		} catch (SQLException e) {
+			throw e;
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+				}
+			}
+			if (ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {
+				}
+			}
+			if (c != null) {
+				try {
+					c.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+	}
+
+	private PreparedStatement makeStatement(Connection c) throws SQLException {
+		PreparedStatement ps;
+		ps = c.prepareStatement("delete from users");
+		return ps;
+	}
+
+	public void jdbcContextWithStatementStrategy(StatementStrategy stmt) throws SQLException {
+
+		Connection c = null;
+		PreparedStatement ps = null;
+
+		try {
+			c = dataSource.getConnection();
+
+			ps = stmt.makepreparedStatement(c);
+
+			ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw e;
+		} finally {
+			if (ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {
+				}
+			}
+			if (c != null) {
+				try {
+					c.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+	}
+}
+*/
+
+public class UserDao {
+
+	private DataSource dataSource;
+
+	private Connection c;
+
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
+
+	/*
+	 * 로컬 클래스 적용한 코드 public void add(final User user) throws SQLException { class
+	 * AddStatementLocal implements StatementStrategy {
+	 * 
+	 * 내부 클래스에서 외부 정보를 받아 쓰기 위하여 주석 처리 외부 변수로 받아쓰면서 add(User user)의 파라메터를 final로 수정
+	 * User user;
+	 * 
+	 * public AddStatementLocal(User user) { this.user = user; }
+	 * 
+	 * public PreparedStatement makePreparedStatement(Connection c) throws
+	 * SQLException { PreparedStatement ps =
+	 * c.prepareStatement("insert into users(id, name, password) values (?,?,?)");
+	 * ps.setString(1, user.getId()); ps.setString(2, user.getName());
+	 * ps.setString(3, user.getPassword()); return ps; } }
+	 * 
+	 * StatementStrategy st = new AddStatementLocal(user); StatementStrategy st =
+	 * new AddStatementLocal(); jdbcContextWithStatementStrategy(st);
+	 * 
+	 * }
+	 */
+
+	public void add(final User user) throws SQLException {
+		/*
+		 * 익명 클래스 사용한 코드 1
+		 * 
+		 * StatementStrategy st = new StatementStrategy() {
+		 * 
+		 * @Override public PreparedStatement makePreparedStatement(Connection c) throws
+		 * SQLException { PreparedStatement ps =
+		 * c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
+		 * ps.setString(1, user.getId()); ps.setString(2, user.getName());
+		 * ps.setString(3, user.getPassword()); return ps; } };
+		 * 
+		 * jdbcContextWithStatementStrategy(st);
+		 */
+
+		jdbcContextWithStatementStrategy(new StatementStrategy() {
+			@Override
+			public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+				PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
+				ps.setString(1, user.getId());
+				ps.setString(2, user.getName());
+				ps.setString(3, user.getPassword());
+				return ps;
+			}
+		});
+	}
+
+	public User get(String id) throws SQLException {
+
+		this.c = dataSource.getConnection();
+
+		PreparedStatement ps = c.prepareStatement("select * from users where id = ?");
+		ps.setString(1, id);
+
+		ResultSet rs = ps.executeQuery();
+		User user = null;
+
+		if (rs.next()) {
+			user = new User();
+			user.setId(rs.getString("id"));
+			user.setName(rs.getString("name"));
+			user.setPassword(rs.getString("password"));
+		}
+
+		rs.close();
+		ps.close();
+		c.close();
+
+		if (user == null)
+			throw new EmptyResultDataAccessException(1);
+
+		return user;
+	}
+
+	public void deleteAll() throws SQLException {
+		/*
+		 * StatementStrategy st = new DeleteAllStatement();
+		 * jdbcContextWithStatementStrategy(st);
+		 */
+		jdbcContextWithStatementStrategy(new StatementStrategy() {
+
+			@Override
+			public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+				// TODO Auto-generated method stub
+				return c.prepareStatement("delete from users");
+			}
+		});
+	}
+
+	public int getCount() throws SQLException {
+
+		Connection c = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			c = dataSource.getConnection();
+			ps = c.prepareStatement("select count(*) from users");
+
+			rs = ps.executeQuery();
+			rs.next();
+			return rs.getInt(1);
+
+		} catch (SQLException e) {
+			throw e;
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+				}
+			}
+			if (ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {
+				}
+			}
+			if (c != null) {
+				try {
+					c.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+	}
+
+	private PreparedStatement makeStatement(Connection c) throws SQLException {
+		PreparedStatement ps;
+		ps = c.prepareStatement("delete from users");
+		return ps;
+	}
+
+	public void jdbcContextWithStatementStrategy(StatementStrategy stmt) throws SQLException {
+
+		Connection c = null;
+		PreparedStatement ps = null;
+
+		try {
+			c = dataSource.getConnection();
+
+			ps = stmt.makePreparedStatement(c);
+
+			ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw e;
+		} finally {
+			if (ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {
+				}
+			}
+			if (c != null) {
+				try {
+					c.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
 	}
 }
