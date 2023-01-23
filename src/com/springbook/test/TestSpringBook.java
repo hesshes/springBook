@@ -20,6 +20,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import com.springbook.dao.JdbcContext;
 import com.springbook.dao.UserDao;
 import com.springbook.domain.User;
 
@@ -273,7 +274,10 @@ public class TestSpringBook {
 		DataSource dataSource = new SingleConnectionDataSource("jdbc:oracle:thin:@localhost:1521:xe", "hesshes",
 				"hesshes", true);
 		dao.setDataSource(dataSource);
-
+		JdbcContext jdbcContext=null;
+		
+		dao.setJdbcContext(jdbcContext);
+		
 		this.user1 = new User("junit", "junit", "junit");
 		this.user2 = new User("junit2", "junit2", "junit2");
 		this.user3 = new User("junit3", "junit3", "junit3");

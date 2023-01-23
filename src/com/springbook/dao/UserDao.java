@@ -784,7 +784,7 @@ public class UserDao {
 }
 */
 
-public class UserDao {
+/*public class UserDao {
 
 	private DataSource dataSource;
 
@@ -794,7 +794,7 @@ public class UserDao {
 		this.dataSource = dataSource;
 	}
 
-	/*
+	
 	 * 로컬 클래스 적용한 코드 public void add(final User user) throws SQLException { class
 	 * AddStatementLocal implements StatementStrategy {
 	 * 
@@ -813,10 +813,10 @@ public class UserDao {
 	 * new AddStatementLocal(); jdbcContextWithStatementStrategy(st);
 	 * 
 	 * }
-	 */
+	 
 
 	public void add(final User user) throws SQLException {
-		/*
+		
 		 * 익명 클래스 사용한 코드 1
 		 * 
 		 * StatementStrategy st = new StatementStrategy() {
@@ -828,7 +828,7 @@ public class UserDao {
 		 * ps.setString(3, user.getPassword()); return ps; } };
 		 * 
 		 * jdbcContextWithStatementStrategy(st);
-		 */
+		 
 
 		jdbcContextWithStatementStrategy(new StatementStrategy() {
 			@Override
@@ -870,10 +870,10 @@ public class UserDao {
 	}
 
 	public void deleteAll() throws SQLException {
-		/*
+		
 		 * StatementStrategy st = new DeleteAllStatement();
 		 * jdbcContextWithStatementStrategy(st);
-		 */
+		 
 		jdbcContextWithStatementStrategy(new StatementStrategy() {
 
 			@Override
@@ -957,4 +957,48 @@ public class UserDao {
 			}
 		}
 	}
+}
+*/
+
+public class UserDao {
+
+	private JdbcContext jdbcContext;
+	private DataSource dataSource;
+
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
+
+	public void setJdbcContext(JdbcContext jdbcContext) {
+		this.jdbcContext = jdbcContext;
+	}
+
+	public void add(final User user) throws SQLException {
+
+		this.jdbcContext.workWithStatementStrategy(new StatementStrategy() {
+			public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+				PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
+				ps.setString(1, user.getId());
+				ps.setString(2, user.getName());
+				ps.setString(3, user.getPassword());
+				return ps;
+			}
+		});
+
+	}
+
+	public void deleteAll() throws SQLException {
+
+		this.jdbcContext.workWithStatementStrategy(new StatementStrategy() {
+			public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+				return c.prepareStatement("delete from users");
+			}
+		});
+
+	}
+
+	public User get(String id) throws SQLException {
+		return null;
+	}
+
 }
