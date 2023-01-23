@@ -268,16 +268,9 @@ public class TestSpringBook {
 
 	@Before
 	public void setUp() {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext("test-applicationContext.xml");
+		this.dao = ctx.getBean("userDao", UserDao.class);
 
-		dao = new UserDao();
-
-		DataSource dataSource = new SingleConnectionDataSource("jdbc:oracle:thin:@localhost:1521:xe", "hesshes",
-				"hesshes", true);
-		dao.setDataSource(dataSource);
-		JdbcContext jdbcContext=null;
-		
-		dao.setJdbcContext(jdbcContext);
-		
 		this.user1 = new User("junit", "junit", "junit");
 		this.user2 = new User("junit2", "junit2", "junit2");
 		this.user3 = new User("junit3", "junit3", "junit3");

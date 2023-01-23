@@ -988,7 +988,6 @@ public class UserDao {
 	}
 
 	public void deleteAll() throws SQLException {
-
 		this.jdbcContext.workWithStatementStrategy(new StatementStrategy() {
 			public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
 				return c.prepareStatement("delete from users");
@@ -998,7 +997,22 @@ public class UserDao {
 	}
 
 	public User get(String id) throws SQLException {
-		return null;
+		return this.jdbcContext.selectWithStatementStrategy(new StatementStrategy() {
+			public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+				PreparedStatement ps = c.prepareStatement("select * from users where id = ?");
+				ps.setString(1, id);
+				return ps;
+			}
+		});
+
 	}
 
+	public int getCount() throws SQLException {
+		return this.jdbcContext.getCountStatementStrategy(new StatementStrategy() {
+			public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+				PreparedStatement ps = c.prepareStatement("select count(*) from users");
+				return ps;
+			}
+		});
+	}
 }
