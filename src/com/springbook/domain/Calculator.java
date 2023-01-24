@@ -78,6 +78,7 @@ public class Calculator {
 				return value * Integer.valueOf(line);
 			}
 		};
+
 		return lineReadTemplate(filePath, multiplyCallBack, 1);
 	}
 
