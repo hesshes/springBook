@@ -59,35 +59,58 @@ public class Calculator {
 	 * System.out.println(e.getMessage()); } } } }
 	 */
 
-	public Integer calcSum(String filePath) throws IOException {
+	/*
+	 * 템플릿 코드 2차 적용 ( 중복 코드 템플릿화 ) public Integer calcSum(String filePath) throws
+	 * IOException {
+	 * 
+	 * LineCallBack sumCallBack = new LineCallBack() { public Integer
+	 * doSomethingWithLine(String line, Integer value) { return value +
+	 * Integer.valueOf(line); } };
+	 * 
+	 * return lineReadTemplate(filePath, sumCallBack, 0); }
+	 * 
+	 * public Integer calcMultiply(String filePath) throws IOException {
+	 * 
+	 * LineCallBack multiplyCallBack = new LineCallBack() {
+	 * 
+	 * public Integer doSomethingWithLine(String line, Integer value) { return value
+	 * * Integer.valueOf(line); } };
+	 * 
+	 * return lineReadTemplate(filePath, multiplyCallBack, 1); }
+	 * 
+	 * public Integer lineReadTemplate(String filePath, LineCallBack callBack, int
+	 * initVal) throws IOException {
+	 * 
+	 * BufferedReader br = null; try { br = new BufferedReader(new
+	 * FileReader(filePath)); Integer res = initVal; String line = null; while
+	 * ((line = br.readLine()) != null) { res = callBack.doSomethingWithLine(line,
+	 * res); } return res; } catch (IOException e) {
+	 * System.out.println(e.getMessage()); throw e; } finally { if (br != null) {
+	 * try { br.close(); } catch (IOException e) {
+	 * System.out.println(e.getMessage()); } } } }
+	 */
 
-		LineCallBack sumCallBack = new LineCallBack() {
-			public Integer doSomethingWithLine(String line, Integer value) {
-				return value + Integer.valueOf(line);
+	// 제네릭 메소드 선언 설명(자체 학습용)
+	// <T> : 제네릭 선언
+	// T : 반환 타입, 파라미터 타입
+
+	public String concatenate(String filePath) throws IOException {
+
+		LineCallBack<String> concatenateCallBack = new LineCallBack<String>() {
+			public String doSomethingWithLine(String line, String value) {
+				return value + line;
 			}
 		};
 
-		return lineReadTemplate(filePath, sumCallBack, 0);
+		return lineReadTemplate(filePath, concatenateCallBack, "");
+
 	}
 
-	public Integer calcMultiply(String filePath) throws IOException {
-
-		LineCallBack multiplyCallBack = new LineCallBack() {
-
-			public Integer doSomethingWithLine(String line, Integer value) {
-				return value * Integer.valueOf(line);
-			}
-		};
-
-		return lineReadTemplate(filePath, multiplyCallBack, 1);
-	}
-
-	public Integer lineReadTemplate(String filePath, LineCallBack callBack, int initVal) throws IOException {
-
+	public <T> T lineReadTemplate(String filePath, LineCallBack<T> callBack, T initVal) throws IOException {
 		BufferedReader br = null;
 		try {
 			br = new BufferedReader(new FileReader(filePath));
-			Integer res = initVal;
+			T res = initVal;
 			String line = null;
 			while ((line = br.readLine()) != null) {
 				res = callBack.doSomethingWithLine(line, res);

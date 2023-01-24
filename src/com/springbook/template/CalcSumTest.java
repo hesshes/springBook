@@ -28,16 +28,14 @@ public class CalcSumTest {
 		this.calculator = new Calculator();
 		this.numFilePath = getClass().getResource("/numbers.txt").getPath();
 	}
-
-	@Test
-	public void sumOfNumbers() throws IOException {
-		assertThat(calculator.calcSum(this.numFilePath), is(10));
-	}
 	
-	@Test
-	public void multiplyOfNumbers() throws IOException {
-		assertThat(calculator.calcMultiply(this.numFilePath), is(10));
-	}
+	/* template , callback  코드 부분
+	 * @Test public void sumOfNumbers() throws IOException {
+	 * assertThat(calculator.calcSum(this.numFilePath), is(10)); }
+	 * 
+	 * @Test public void multiplyOfNumbers() throws IOException {
+	 * assertThat(calculator.calcMultiply(this.numFilePath), is(10)); }
+	 */
 }
 
 	
