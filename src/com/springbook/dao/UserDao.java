@@ -963,17 +963,17 @@ public class UserDao {
 public class UserDao {
 
 	private DataSource dataSource;
-	
+
 	private JdbcContext jdbcContext;
 
 	public void setDataSource(DataSource dataSource) {
-		
+
 		this.jdbcContext = new JdbcContext();
-		
+
 		this.jdbcContext.setDataSource(dataSource);
-		
+
 		this.dataSource = dataSource;
-		
+
 	}
 
 	public void setJdbcContext(JdbcContext jdbcContext) {
@@ -994,13 +994,22 @@ public class UserDao {
 
 	}
 
-	public void deleteAll() throws SQLException {
-		this.jdbcContext.workWithStatementStrategy(new StatementStrategy() {
-			public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-				return c.prepareStatement("delete from users");
-			}
-		});
+	/*
+	 * public void deleteAll() throws SQLException {
+	 * this.jdbcContext.workWithStatementStrategy(new StatementStrategy() { public
+	 * PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+	 * return c.prepareStatement("delete from users"); } });
+	 * 
+	 * }
+	 */
 
+	/* JdbcContext 내부로 executeSql 함수 옮기기 전 코드
+	 * public void deleteAll() throws SQLException {
+	 * executeSql("delete from users"); }
+	 */
+	
+	public void deleteAll() throws SQLException {
+		this.jdbcContext.executeSql("delete from users");
 	}
 
 	public User get(String id) throws SQLException {
@@ -1019,6 +1028,14 @@ public class UserDao {
 			public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
 				PreparedStatement ps = c.prepareStatement("select count(*) from users");
 				return ps;
+			}
+		});
+	}
+
+	private void executeSql(final String query) throws SQLException {
+		this.jdbcContext.workWithStatementStrategy(new StatementStrategy() {
+			public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+				return c.prepareStatement(query);
 			}
 		});
 	}
