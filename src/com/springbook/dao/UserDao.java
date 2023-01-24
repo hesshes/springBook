@@ -962,18 +962,24 @@ public class UserDao {
 
 public class UserDao {
 
-	private JdbcContext jdbcContext;
 	private DataSource dataSource;
+	
+	private JdbcContext jdbcContext;
 
 	public void setDataSource(DataSource dataSource) {
+		
+		this.jdbcContext = new JdbcContext();
+		
+		this.jdbcContext.setDataSource(dataSource);
+		
 		this.dataSource = dataSource;
+		
 	}
 
-	/*
-	 * public void setJdbcContext(JdbcContext jdbcContext) { this.jdbcContext =
-	 * jdbcContext; }
-	 */
-	
+	public void setJdbcContext(JdbcContext jdbcContext) {
+		this.jdbcContext = jdbcContext;
+	}
+
 	public void add(final User user) throws SQLException {
 
 		this.jdbcContext.workWithStatementStrategy(new StatementStrategy() {
